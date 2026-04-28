@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
@@ -11,60 +12,60 @@ load_dotenv()
 # Função para criar conexão com o banco de dados
 def get_db_connection():
     db_url = os.getenv("DATABASE_URL")
-    
-    if not db_url:
-        st.warning("DATABASE_URL não encontrada. Usando SQLite local.")
-        return create_engine("DATABASE_URL")
+    if not db_url or "localhost" in db_url or "127.0.0.1" in db_url:
+        # Se a variável não estiver definida ou apontar para localhost, use SQLite
+        st.warning("DATABASE_URL não definida ou apontando para localhost. Usando SQLite.")
+        db_url = "sqlite:///temp_database.db"
+        st.info(f"Usando banco de dados local: {db_url}")
+    else:
+        st.info(f"Conectando ao banco de dados com URL: {db_url}")
     
     try:
-        if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql://", 1)
-            
         return create_engine(db_url)
     except Exception as e:
         st.error(f"Falha ao conectar ao banco de dados: {e}")
-        return create_engine("DATABASE_URL")
+        st.warning("Alternando para banco de dados SQLite")
+        return create_engine("sqlite:///temp_database.db")
      
+# Função para criar tabela no PostgreSQL
 def create_table(engine, df):
-    # Envia os dados para a tabela
-    df.to_sql('temperature_logs', engine, if_exists='replace', index=False)
+    df.to_sql('temperature_logs', engine,
+        if_exists='replace', index=False)
 
-# --- Interface Streamlit ---
-st.title("🌡️ Dashboard IoT - Upload de Temperaturas")
-
-uploaded_file = st.file_uploader("Upload do arquivo CSV (Kaggle)", type="csv")
+# Upload do arquivo CSV
+st.title("Upload de Arquivo CSV")
+uploaded_file = st.file_uploader("Upload CSV temperature data file",
+        type="csv")
 
 if uploaded_file is not None:
+    # Leitura do arquivo CSV
     df = pd.read_csv(uploaded_file)
-    
-    # AJUSTE 1: Converter data para formato datetime
-    if 'noted_date' in df.columns:
-        df['noted_date'] = pd.to_datetime(df['noted_date'])
-    
-    st.subheader("Visualização prévia dos dados (Top 5)")
+    st.write("Estrutura do Dataset:")
     st.write(df.head())
   
+    # Conectar ao banco de dados
     engine = get_db_connection()
     
-    try:
-        # AJUSTE 2: Garantir que a tabela seja criada corretamente
-        create_table(engine, df)
-        st.success("Dados persistidos no PostgreSQL (Render) com sucesso.")
-    
-        # Busca os dados do banco para garantir que a leitura está vindo de lá
-        query = "SELECT * FROM temperature_logs ORDER BY noted_date ASC"
-        data = pd.read_sql(query, engine)
+    if engine is not None:
+        try:
+            # Criar tabela no banco de dados
+            create_table(engine, df)
+            st.success("Dados enviados para o banco de dados.")
         
-        st.divider() # Linha visual para separar as seções
-        
-        st.title("Visualização da Série Temporal")
-        fig = px.line(data, 
-                      x='noted_date', 
-                      y='temp', 
-                      title='Variação de Temperatura ao Longo do Tempo')
-        
-        fig.update_layout(xaxis_title="Data da Leitura", yaxis_title="Temperatura (°C)")
-        st.plotly_chart(fig)
-
-    except Exception as e:
-        st.error(f"Erro na operação de banco de dados: {e}")
+            # Ler dados do banco de dados
+            query = "SELECT * FROM temperature_logs"
+            data = pd.read_sql(query, engine)
+        except Exception as e:
+            st.error(f"Database operation failed: {e}")
+            data = df  # Fall back to using the uploaded dataframe directly
+    else:
+        st.warning("Using uploaded data directly without database.")
+        data = df
+  
+    # Visualização dos dados com Plotly
+    st.title("Visualização dos Dados")
+    fig = px.line(data,
+                  x='noted_date',
+                  y='temp',
+                  title='Série Temporal de Temperaturas')
+    st.plotly_chart(fig)
