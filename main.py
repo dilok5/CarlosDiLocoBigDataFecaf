@@ -14,7 +14,7 @@ def get_db_connection():
     
     if not db_url:
         st.warning("DATABASE_URL não encontrada. Usando SQLite local.")
-        return create_engine("sqlite:///temp_database.db")
+        return create_engine("DATABASE_URL")
     
     try:
         if db_url.startswith("postgres://"):
@@ -23,7 +23,7 @@ def get_db_connection():
         return create_engine(db_url)
     except Exception as e:
         st.error(f"Falha ao conectar ao banco de dados: {e}")
-        return create_engine("sqlite:///temp_database.db")
+        return create_engine("DATABASE_URL")
      
 def create_table(engine, df):
     # Envia os dados para a tabela
