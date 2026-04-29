@@ -1,10 +1,10 @@
-  🌡️ Big Data FECAF - Dashboard IoT  Projeto focado na ingestão, persistência e visualização de dados de sensores IoT, desenvolvido para a disciplina de **Big Data**. A aplicação utiliza **Streamlit** para a interface, **PostgreSQL (Render)** para persistência e **Plotly** para análise gráfica.
+ # 🌡️ Big Data FECAF - Dashboard IoT  Projeto focado na ingestão, persistência e visualização de dados de sensores IoT, desenvolvido para a disciplina de **Big Data**. A aplicação utiliza **Streamlit** para a interface, **PostgreSQL (Render)** para persistência e **Plotly** para análise gráfica.
  <img width="1903" height="1029" alt="image" src="https://github.com/user-attachments/assets/71922844-47f7-4136-89c4-b1043857458f" />
 
  <img width="704" height="450" alt="newplot" src="https://github.com/user-attachments/assets/766e6f17-c352-471e-8b48-c8545129064c" />
  
  
-  🛠️ Tecnologias Utilizadas  * **Streamlit**: Framework de interface web.  * **Pandas**: Processamento e análise de dados.  * **SQLAlchemy**: Gestão de conexão com banco de dados.  * **PostgreSQL**: Banco de dados relacional hospedado no Render.com.  * **Plotly**: Geração de gráficos de séries temporais.  ---  
+ # 🛠️ Tecnologias Utilizadas  * **Streamlit**: Framework de interface web.  * **Pandas**: Processamento e análise de dados.  * **SQLAlchemy**: Gestão de conexão com banco de dados.  * **PostgreSQL**: Banco de dados relacional hospedado no Render.com.  * **Plotly**: Geração de gráficos de séries temporais.  ---  
  
   💻 Evolução do Desenvolvimento  Abaixo, apresento a comparação entre a primeira versão do sistema e a versão final otimizada, detalhando as melhorias de resiliência aplicadas.  
  
